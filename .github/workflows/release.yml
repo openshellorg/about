@@ -1,0 +1,95 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release (e.g. v0.1.0); empty uses the pushed tag'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build APE and publish GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve version
+        id: ver
+        run: |
+          if [ -n "${{ github.event.inputs.tag }}" ]; then
+            TAG="${{ github.event.inputs.tag }}"
+          else
+            TAG="${GITHUB_REF_NAME}"
+          fi
+          VERSION="${TAG#v}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Install unzip
+        run: sudo apt-get update && sudo apt-get install -y unzip
+
+      - name: Build APE
+        run: make ape VERSION=${{ steps.ver.outputs.version }}
+
+      - name: Install APE loader and smoke-test
+        run: |
+          sudo wget -q -O /usr/bin/ape "https://cosmo.zip/pub/cosmos/bin/ape-$(uname -m).elf"
+          sudo chmod +x /usr/bin/ape
+          echo ':APE:M::MZqFpD::/usr/bin/ape:' | sudo tee /proc/sys/fs/binfmt_misc/register >/dev/null || true
+          echo ':APE-jart:M::jartsr::/usr/bin/ape:' | sudo tee /proc/sys/fs/binfmt_misc/register >/dev/null || true
+          ./about.com --version
+          ./about.com -q
+
+      - name: Package
+        run: |
+          VERSION="${{ steps.ver.outputs.version }}"
+          mkdir -p dist
+          cp about.com "dist/about-${VERSION}-universal.com"
+          # Windows-friendly copy
+          cp about.com "dist/about-${VERSION}-universal.exe"
+          (
+            cd dist
+            sha256sum about-${VERSION}-universal.com about-${VERSION}-universal.exe > SHA256SUMS
+          )
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: about ${{ steps.ver.outputs.version }}
+          generate_release_notes: true
+          files: |
+            dist/about-${{ steps.ver.outputs.version }}-universal.com
+            dist/about-${{ steps.ver.outputs.version }}-universal.exe
+            dist/SHA256SUMS
+          body: |
+            ## about ${{ steps.ver.outputs.version }}
+
+            **Universal binary** built with [Cosmopolitan Libc](https://justine.lol/cosmopolitan/)
+            ([Actually Portable Executable](https://justine.lol/ape.html)) — one file for
+            Linux, macOS, Windows, and BSDs (amd64 + arm64).
+
+            ### Install
+
+            ```shell
+            chmod +x about-${{ steps.ver.outputs.version }}-universal.com
+            ./about-${{ steps.ver.outputs.version }}-universal.com
+            # optional: install on PATH
+            sudo cp about-${{ steps.ver.outputs.version }}-universal.com /usr/local/bin/about
+            ```
+
+            On Windows, use the `.exe` copy (same bytes) or rename `.com` → `.exe`.
+
+            ### Verify
+
+            ```shell
+            sha256sum -c SHA256SUMS
+            ```

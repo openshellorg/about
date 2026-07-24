@@ -1,0 +1,19 @@
+= 2026-07-23 — Initial about CLI
+:toc:
+
+== Summary
+
+First release of `about`: a small C program that prints OS/distro, shell, and
+orientation facts, plus a short platform-specific discovery cheat sheet.
+
+== Details
+
+* Native build via `make` (any POSIX `cc`)
+* Optional Actually Portable Executable via `make ape` (Cosmopolitan `cosmocc`)
+* Detects Linux distros (`/etc/os-release`), macOS (`sw_vers`), Windows (`ver` / env), WSL2, and light container hints
+* GitHub Actions: smoke-test on push; publish APE + checksums on version tags
+
+== Motivation
+
+Unfamiliar shells (especially WSL distros “in the wild”) lack a single obvious
+command for “what is this?”. `about` is that command.

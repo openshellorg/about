@@ -1,0 +1,84 @@
+= about
+:toc: preamble
+:icons: font
+
+One command to answer: *what machine is this, and how do I look around?*
+
+== Why
+
+Drop into a random Linux box via `wsl`, SSH, a container, or a teammate's
+laptop, and the discovery story is a mess: `/etc/os-release` (sometimes),
+`uname`, `sw_vers`, `systeminfo`, `$SHELL` vs `ps -p $$`, WSL env vars that
+only exist on good days…
+
+`about` prints the orientation facts first, then a short cheat sheet of the
+commands that actually help on *this* OS family.
+
+== Quick start
+
+[source,shell]
+----
+make
+./about
+----
+
+Install onto PATH:
+
+[source,shell]
+----
+sudo make install    # PREFIX=/usr/local by default
+about
+----
+
+== Actually Portable Executable (recommended release artifact)
+
+Release builds use https://justine.lol/cosmopolitan/[Cosmopolitan Libc]
+(Justine Tunney) to produce an
+https://justine.lol/ape.html[Actually Portable Executable] — one fat binary
+that runs natively on Linux, macOS, Windows, and BSDs (amd64 + arm64).
+
+[source,shell]
+----
+make ape             # downloads cosmocc into .cosmocc/ on first run
+./about.com
+----
+
+On Windows you can rename `about.com` → `about.exe` if your shell expects an
+extension. On some Linux distros you may need the APE loader registered with
+`binfmt_misc` (see Cosmopolitan docs) if the kernel tries to hand the MZ
+header to WINE.
+
+== Usage
+
+----
+about              # facts + discovery tips
+about -q           # facts only
+about --tips       # tips only
+about --version
+----
+
+== What it reports
+
+* OS / distro (`/etc/os-release`, `sw_vers`, Windows `ver`, …)
+* Kernel + architecture (`uname`)
+* Environment: native, WSL2, container hints
+* Hostname, user, home, cwd
+* Shell (`$SHELL`, passwd shell, or Windows `ComSpec` / PowerShell clues)
+* Terminal (`TERM_PROGRAM` / `TERM` / Windows Terminal)
+
+Plus platform-specific “look around” commands (`df`, `free`/`vm_stat`,
+package-manager probes, `wsl -l -v`, etc.).
+
+== Related
+
+* https://github.com/openshellorg/shell-architecture[shell-architecture] — OpenShellOrg thesis
+* https://github.com/openshellorg/nu-require[nu-require] — require / relaunch under Nushell
+* https://justine.lol/cosmopolitan/[Cosmopolitan Libc] — build-once run-anywhere C
+
+== Changelog
+
+See link:CHANGELOG.adoc[CHANGELOG.adoc].
+
+== License
+
+MIT — see link:LICENSE[]

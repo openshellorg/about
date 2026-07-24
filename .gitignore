@@ -1,0 +1,17 @@
+*
+!.gitignore
+!README.adoc
+!README.md
+!CHANGELOG.adoc
+!LICENSE
+!Makefile
+!src/
+!src/**
+!docs/
+!docs/**
+!scripts/
+!scripts/**
+!.github/
+!.github/**
+!changelog-details/
+!changelog-details/**
