@@ -1,0 +1,24 @@
+= Usage
+:description: about CLI flags and what it reports.
+
+----
+about                 # facts + discovery tips (nu-aware)
+about tar             # short orientation card for a command
+about -q              # facts only
+about --tips          # tips only
+about --nu            # force Nushell tip sheet
+about --classic       # force classic tip sheet + Nushell nudge
+about --format nuon   # structured record (pipe: about --format nuon | from nuon)
+about --version
+----
+
+== What it reports
+
+* OS / distro (`/etc/os-release`, `sw_vers`, Windows `ver`, …)
+* Kernel + architecture (`uname`)
+* Environment: native, WSL2, container hints
+* Hostname, user, home, cwd
+* Shell (`$SHELL`, passwd shell, or Windows `ComSpec` / PowerShell clues; prefers live Nushell via `NU_VERSION` when present)
+* Terminal (`TERM_PROGRAM` / `TERM` / Windows Terminal)
+
+Plus platform-specific "look around" commands — Nushell builtins under `nu`, classic tools otherwise.

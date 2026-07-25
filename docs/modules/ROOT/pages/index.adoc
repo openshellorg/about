@@ -1,0 +1,42 @@
+= about
+:description: Orient yourself — OS, shell, and how to look around.
+
+One command to answer: *what machine is this, and how do I look around?*
+
+== Why
+
+Drop into a random Linux box via `wsl`, SSH, a container, or a teammate's laptop, and the discovery story is a mess: `/etc/os-release` (sometimes), `uname`, `sw_vers`, `systeminfo`, `$SHELL` vs `ps -p $$`, WSL env vars that only exist on good days…
+
+`about` prints the orientation facts first, then a short cheat sheet of the commands that actually help on *this* OS family.
+
+Under https://www.nushell.sh/[Nushell], the cheat sheet switches to structured `nu` idioms (`sys`, `$env`, `ls`, …).
+Outside Nushell, you still get the full classic tip sheet — plus a nudge to install `nu`.
+Nushell is never required; `about` always runs.
+
+== Quick start
+
+[source,shell]
+----
+make
+./about
+----
+
+Install onto PATH:
+
+[source,shell]
+----
+sudo make install    # PREFIX=/usr/local by default
+about
+----
+
+== Actually Portable Executable
+
+Release builds use https://justine.lol/cosmopolitan/[Cosmopolitan Libc] to produce an https://justine.lol/ape.html[Actually Portable Executable] — one fat binary for Linux, macOS, Windows, and BSDs (amd64 + arm64).
+
+[source,shell]
+----
+make ape
+./about.com
+----
+
+See xref:build.adoc[Building] for WSL and CI notes.

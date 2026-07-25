@@ -1,0 +1,12 @@
+= Nushell Integration
+:description: How about adapts tips and output under Nushell.
+
+Detection uses `$env.NU_VERSION` (exported to child processes).
+When present:
+
+* Facts render as a small table
+* Tips use Nushell builtins (`sys`, `$nu.os-info`, `$env`, `df`, `ps`, …)
+* `--format nuon` emits a record you can `from nuon` in a pipeline
+
+When *not* under Nushell, tips stay classic (bash/zsh/pwsh/cmd idioms) and `about` points you at https://www.nushell.sh/[nushell.sh] with install hints.
+If `nu` is already on `PATH`, it tells you to just run it.

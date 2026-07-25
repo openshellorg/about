@@ -1,0 +1,8 @@
+= Related Tools
+:description: OpenShellOrg tools that pair with about.
+
+* xref:prohelp::index.adoc[prohelp] — progressive help + global `help`
+* xref:info::index.adoc[info] — Info TUI (OpenShellOrg)
+* xref:nu-require::index.adoc[nu-require] — require / relaunch under Nushell
+* xref:shell-architecture::index.adoc[shell-architecture] — OpenShellOrg thesis
+* https://justine.lol/cosmopolitan/[Cosmopolitan Libc] — build-once run-anywhere C
