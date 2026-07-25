@@ -1,0 +1,3 @@
+= 2026-07-25 — Command orientation cards
+
+`about <command>` prints a short orientation card (summary / optional background from `info --orient` or `help --orient`), lists PATH binaries, and points at `help` / `info` / `man` for deeper reading. Tip sheets now crosslink those discovery tools. Version 0.3.0.

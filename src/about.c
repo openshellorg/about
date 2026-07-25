@@ -19,7 +19,7 @@
 #include <unistd.h>
 
 #ifndef ABOUT_VERSION
-#define ABOUT_VERSION "0.2.0"
+#define ABOUT_VERSION "0.3.0"
 #endif
 
 #define ABOUT_MAX 512
@@ -618,6 +618,10 @@ static void print_tips_nushell(const struct about_info *info) {
   puts("  which apt dnf zypper brew winget   # package managers on PATH");
   puts("  help commands | where name =~ 'sys'  # discover related builtins");
   puts("  about --format nuon | from nuon      # machine-readable about");
+  puts("  about tar                    # short orientation card for a command");
+  puts("  help tar                     # progressive help (prohelp), if installed");
+  puts("  info tar                     # Info manual (OpenShellOrg / GNU)");
+  puts("  man tar                      # traditional man page");
   if (info->is_wsl) {
     puts("  ^wsl.exe -l -v              # list WSL distros (external)");
     puts("  $env.WSL_DISTRO_NAME?       # this distro's name (if set)");
@@ -666,6 +670,10 @@ static void print_tips_linux(int is_wsl) {
   puts("  env | sort                   # environment variables");
   puts("  ls /                         # filesystem layout");
   puts("  command -v apt dnf zypper pacman apk  # which package manager");
+  puts("  about tar                    # short orientation for a command");
+  puts("  help tar                     # progressive help (prohelp)");
+  puts("  info tar                     # Info manual");
+  puts("  man tar                      # man page");
   if (is_wsl) {
     puts("  wsl.exe -l -v                # from Windows: list distros");
     puts("  echo \"$WSL_DISTRO_NAME\"      # this WSL distro's name");
@@ -682,6 +690,8 @@ static void print_tips_macos(void) {
   puts("  ifconfig                     # network interfaces");
   puts("  brew --prefix                # Homebrew prefix (if installed)");
   puts("  env | sort                   # environment variables");
+  puts("  about tar                    # short orientation for a command");
+  puts("  help tar / info tar / man tar");
 }
 
 static void print_tips_windows(void) {
@@ -693,6 +703,8 @@ static void print_tips_windows(void) {
   puts("  wsl -l -v                    # installed Linux distros (WSL)");
   puts("  where.exe about              # which about is on PATH");
   puts("  Get-ChildItem Env: | Sort-Object Name   # environment");
+  puts("  about tar                    # short orientation for a command");
+  puts("  help tar / info tar / man tar");
 }
 
 static void print_tips_bsd(void) {
@@ -702,6 +714,8 @@ static void print_tips_bsd(void) {
   puts("  df -h                        # disk space");
   puts("  sysctl -a | less             # kernel tunables (careful)");
   puts("  ifconfig                     # network");
+  puts("  about tar                    # short orientation for a command");
+  puts("  help tar / info tar / man tar");
 }
 
 static void print_tips_classic(const struct about_info *info) {
@@ -721,6 +735,140 @@ static void print_tips_classic(const struct about_info *info) {
     puts("  echo \"$SHELL\"");
     puts("  env | sort");
   }
+  puts("");
+}
+
+static int extract_sdl_field(const char *sdl, const char *key, char *out, size_t out_n) {
+  char pattern[128];
+  const char *p;
+  const char *start;
+  const char *end;
+  size_t key_len;
+
+  snprintf(pattern, sizeof(pattern), "%s \"", key);
+  p = strstr(sdl, pattern);
+  if (!p) {
+    return 0;
+  }
+  start = p + strlen(pattern);
+  end = start;
+  while (*end && *end != '"') {
+    if (*end == '\\' && end[1]) {
+      end += 2;
+      continue;
+    }
+    end++;
+  }
+  if (*end != '"') {
+    return 0;
+  }
+  key_len = (size_t)(end - start);
+  if (key_len >= out_n) {
+    key_len = out_n - 1;
+  }
+  memcpy(out, start, key_len);
+  out[key_len] = '\0';
+  return 1;
+}
+
+static int tool_on_path(const char *name) {
+  char cmd[ABOUT_LINE];
+  char out[ABOUT_MAX];
+#if defined(_WIN32) && !defined(__CYGWIN__)
+  snprintf(cmd, sizeof(cmd), "where %s 2>NUL", name);
+#else
+  snprintf(cmd, sizeof(cmd), "command -v %s 2>/dev/null", name);
+#endif
+  return run_capture(cmd, out, sizeof(out)) && out[0] != '\0';
+}
+
+static void list_binaries(const char *name) {
+  char cmd[ABOUT_LINE];
+  char out[ABOUT_LINE * 4];
+#if defined(_WIN32) && !defined(__CYGWIN__)
+  snprintf(cmd, sizeof(cmd), "where %s 2>NUL", name);
+#else
+  snprintf(cmd, sizeof(cmd), "which -a %s 2>/dev/null || command -v %s 2>/dev/null",
+           name, name);
+#endif
+  if (run_capture(cmd, out, sizeof(out)) && out[0]) {
+    char *line = out;
+    char *nl;
+    puts("Binaries:");
+    while (line && *line) {
+      nl = strchr(line, '\n');
+      if (nl) {
+        *nl = '\0';
+      }
+      if (line[0]) {
+        printf("  %s\n", line);
+      }
+      line = nl ? nl + 1 : NULL;
+    }
+  } else {
+    puts("Binaries: (not found on PATH)");
+  }
+}
+
+static int load_orient_via(const char *tool, const char *name, char *buf, size_t buf_n) {
+  char cmd[ABOUT_LINE];
+#if defined(_WIN32) && !defined(__CYGWIN__)
+  snprintf(cmd, sizeof(cmd), "%s --orient %s 2>NUL", tool, name);
+#else
+  snprintf(cmd, sizeof(cmd), "%s --orient %s 2>/dev/null", tool, name);
+#endif
+  return run_capture(cmd, buf, buf_n) && strstr(buf, "orientation") != NULL;
+}
+
+static void print_command_card(const char *name) {
+  char sdl[ABOUT_LINE * 8];
+  char summary[ABOUT_MAX];
+  char description[ABOUT_LINE * 2];
+  char history[ABOUT_LINE * 2];
+  int have = 0;
+
+  summary[0] = description[0] = history[0] = '\0';
+  sdl[0] = '\0';
+
+  if (tool_on_path("info") && load_orient_via("info", name, sdl, sizeof(sdl))) {
+    have = 1;
+  } else if (tool_on_path("help") && load_orient_via("help", name, sdl, sizeof(sdl))) {
+    have = 1;
+  }
+
+  if (have) {
+    extract_sdl_field(sdl, "summary", summary, sizeof(summary));
+    extract_sdl_field(sdl, "description", description, sizeof(description));
+    extract_sdl_field(sdl, "history", history, sizeof(history));
+  }
+
+  puts("");
+  printf("%s — orientation\n", name);
+  puts("────────────────────────────────────────");
+  if (summary[0]) {
+    puts(summary);
+  } else {
+    puts("(No shared orientation pack yet — dig deeper with the links below.)");
+  }
+  if (description[0]) {
+    puts("");
+    puts(description);
+  }
+  if (history[0]) {
+    puts("");
+    puts("Background");
+    puts(history);
+  }
+  puts("");
+  list_binaries(name);
+  puts("");
+  puts("Dig deeper:");
+  printf("  help %s                 # progressive help (prohelp)%s\n", name,
+         tool_on_path("help") ? "" : "  [not on PATH]");
+  printf("  info %s                 # Info manual%s\n", name,
+         tool_on_path("info") ? "" : "  [not on PATH]");
+  printf("  man %s                  # man page%s\n", name,
+         tool_on_path("man") ? "" : "  [not on PATH]");
   puts("");
 }
 
@@ -771,8 +919,10 @@ static void print_report(const struct about_info *info, int tips,
 }
 
 static void print_usage(const char *argv0) {
-  printf("Usage: %s [options]\n\n", argv0);
+  printf("Usage: %s [options]\n", argv0);
+  printf("       %s <command>\n\n", argv0);
   puts("Orient yourself: distro/OS, shell, and how to explore further.");
+  puts("Or: short orientation card for a command (not a full manual).");
   puts("Works in any shell; under Nushell, tips become structured `nu` idioms.");
   puts("");
   puts("Options:");
@@ -784,6 +934,9 @@ static void print_usage(const char *argv0) {
   puts("  --nu                 Force Nushell tip sheet (even outside nu)");
   puts("  --classic            Force classic UNIX/PowerShell tip sheet");
   puts("");
+  puts("Command card:");
+  puts("  about tar            Summary / background + dig-deeper links");
+  puts("");
 }
 
 int main(int argc, char **argv) {
@@ -793,6 +946,7 @@ int main(int argc, char **argv) {
   int force_nu = 0;
   int force_classic = 0;
   enum about_format fmt = ABOUT_FMT_TEXT;
+  const char *command_card = NULL;
   int i;
 
   for (i = 1; i < argc; i++) {
@@ -849,9 +1003,27 @@ int main(int argc, char **argv) {
       }
       continue;
     }
-    fprintf(stderr, "about: unknown option: %s\n", argv[i]);
-    print_usage(argv[0]);
-    return 2;
+    if (argv[i][0] == '-') {
+      fprintf(stderr, "about: unknown option: %s\n", argv[i]);
+      print_usage(argv[0]);
+      return 2;
+    }
+    if (command_card) {
+      fprintf(stderr, "about: unexpected argument: %s\n", argv[i]);
+      print_usage(argv[0]);
+      return 2;
+    }
+    command_card = argv[i];
+  }
+
+  if (command_card) {
+    if (tips_only || force_nu || force_classic || fmt == ABOUT_FMT_NUON) {
+      fprintf(stderr,
+              "about: <command> card cannot combine with --tips/--nu/--classic/--format\n");
+      return 2;
+    }
+    print_command_card(command_card);
+    return 0;
   }
 
   if (force_nu && force_classic) {

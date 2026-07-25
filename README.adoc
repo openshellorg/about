@@ -57,6 +57,7 @@ header to WINE.
 
 ----
 about                 # facts + discovery tips (nu-aware)
+about tar             # short orientation card for a command
 about -q              # facts only
 about --tips          # tips only
 about --nu            # force Nushell tip sheet
@@ -94,6 +95,8 @@ classic tools otherwise (`df`, `free`/`vm_stat`, package-manager probes,
 == Related
 
 * https://github.com/openshellorg/shell-architecture[shell-architecture] — OpenShellOrg thesis
+* https://github.com/openshellorg/prohelp[prohelp] — progressive help + global `help`
+* https://github.com/openshellorg/info[info] — Info TUI (OpenShellOrg)
 * https://github.com/openshellorg/nu-require[nu-require] — require / relaunch under Nushell
 * https://justine.lol/cosmopolitan/[Cosmopolitan Libc] — build-once run-anywhere C
 
