@@ -7,4 +7,5 @@ For longer narratives, see link:changelog-details/[changelog-details/] (when pre
 
 == Timeline
 
+* 2026-07-24 — link:changelog-details/2026-07-24%20-%20nushell-aware%20output.adoc[Nushell-aware output] — Nu tip sheet, classic-shell nudge, `--format nuon`.
 * 2026-07-23 — link:changelog-details/2026-07-23%20-%20initial%20about%20cli.adoc[Initial `about` CLI] — native + Cosmopolitan APE builds, CI release pipeline.

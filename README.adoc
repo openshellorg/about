@@ -14,6 +14,11 @@ only exist on good days…
 `about` prints the orientation facts first, then a short cheat sheet of the
 commands that actually help on *this* OS family.
 
+Under https://www.nushell.sh/[Nushell], the cheat sheet switches to structured
+`nu` idioms (`sys`, `$env`, `ls`, …). Outside Nushell, you still get the full
+classic tip sheet — plus a nudge to install `nu` and leave the text-soup shells
+behind. Nushell is never required; `about` always runs.
+
 == Quick start
 
 [source,shell]
@@ -51,11 +56,26 @@ header to WINE.
 == Usage
 
 ----
-about              # facts + discovery tips
-about -q           # facts only
-about --tips       # tips only
+about                 # facts + discovery tips (nu-aware)
+about -q              # facts only
+about --tips          # tips only
+about --nu            # force Nushell tip sheet
+about --classic       # force classic tip sheet + Nushell nudge
+about --format nuon   # structured record (pipe: about --format nuon | from nuon)
 about --version
 ----
+
+== Nushell
+
+Detection uses `$env.NU_VERSION` (exported to child processes). When present:
+
+* Facts render as a small table
+* Tips use Nushell builtins (`sys`, `$nu.os-info`, `$env`, `df`, `ps`, …)
+* `--format nuon` emits a record you can `from nuon` in a pipeline
+
+When *not* under Nushell, tips stay classic (bash/zsh/pwsh/cmd idioms) and
+`about` points you at https://www.nushell.sh/[nushell.sh] with install hints.
+If `nu` is already on `PATH`, it tells you to just run it.
 
 == What it reports
 
@@ -63,11 +83,13 @@ about --version
 * Kernel + architecture (`uname`)
 * Environment: native, WSL2, container hints
 * Hostname, user, home, cwd
-* Shell (`$SHELL`, passwd shell, or Windows `ComSpec` / PowerShell clues)
+* Shell (`$SHELL`, passwd shell, or Windows `ComSpec` / PowerShell clues;
+  prefers live Nushell via `NU_VERSION` when present)
 * Terminal (`TERM_PROGRAM` / `TERM` / Windows Terminal)
 
-Plus platform-specific “look around” commands (`df`, `free`/`vm_stat`,
-package-manager probes, `wsl -l -v`, etc.).
+Plus platform-specific “look around” commands — Nushell builtins under `nu`,
+classic tools otherwise (`df`, `free`/`vm_stat`, package-manager probes,
+`wsl -l -v`, etc.).
 
 == Related
 

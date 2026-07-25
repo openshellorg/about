@@ -1,0 +1,22 @@
+= 2026-07-24 — Nushell-aware output
+:toc:
+
+== Summary
+
+`about` stays usable from any shell, but grows a specialized path for Nushell
+and a deliberate nudge for everyone else.
+
+== Details
+
+* Detect Nushell via `NU_VERSION` (live session beats `$SHELL` login shell)
+* Under Nushell: table-styled facts + structured discovery tips (`sys`, `$env`, …)
+* Outside Nushell: classic OS tip sheet, then install/`nu`-on-PATH nudge
+* `--format nuon` for pipe-friendly records (`about --format nuon | from nuon`)
+* `--nu` / `--classic` force tip-sheet style without changing gathered facts
+* Version bump to 0.2.0
+
+== Motivation
+
+OpenShellOrg advocates Nushell over reinventing a structured shell. `about`
+should teach the escape hatch while still orienting users stranded in bash,
+zsh, pwsh, or cmd.
