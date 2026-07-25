@@ -19,7 +19,7 @@
 #include <unistd.h>
 
 #ifndef ABOUT_VERSION
-#define ABOUT_VERSION "0.1.0"
+#define ABOUT_VERSION "0.2.0"
 #endif
 
 #define ABOUT_MAX 512
@@ -39,11 +39,19 @@ struct about_info {
   char shell_name[ABOUT_MAX];
   char term[ABOUT_MAX];
   char environment[ABOUT_MAX]; /* WSL2, native, container, etc. */
+  char nu_version[ABOUT_MAX];
   int is_linux;
   int is_macos;
   int is_windows;
   int is_bsd;
   int is_wsl;
+  int in_nushell;   /* child of a Nushell session (NU_VERSION set) */
+  int nu_on_path;   /* `nu` resolvable without requiring it */
+};
+
+enum about_format {
+  ABOUT_FMT_TEXT = 0,
+  ABOUT_FMT_NUON = 1
 };
 
 static void trim(char *s) {
@@ -275,10 +283,45 @@ static void detect_windows(struct about_info *info) {
   }
 }
 
+static int probe_nu_on_path(void) {
+  char buf[ABOUT_MAX];
+  /* Prefer POSIX which/command; fall back to Windows where.exe. */
+  if (run_capture("command -v nu 2>/dev/null", buf, sizeof(buf))) {
+    return 1;
+  }
+  if (run_capture("which nu 2>/dev/null", buf, sizeof(buf))) {
+    return 1;
+  }
+  if (run_capture("where.exe nu 2>nul", buf, sizeof(buf))) {
+    return 1;
+  }
+  return 0;
+}
+
 static void detect_shell(struct about_info *info) {
   const char *shell = getenv("SHELL");
   const char *comspec;
   const char *psmod;
+  const char *nu_ver = getenv("NU_VERSION");
+
+  if (nu_ver && nu_ver[0]) {
+    info->in_nushell = 1;
+    set_str(info->nu_version, sizeof(info->nu_version), nu_ver);
+  }
+
+  info->nu_on_path = info->in_nushell || probe_nu_on_path();
+
+  if (info->in_nushell) {
+    /* Prefer the live session over $SHELL (often still bash/zsh login shell). */
+    set_str(info->shell, sizeof(info->shell), "nu ");
+    {
+      size_t used = strlen(info->shell);
+      snprintf(info->shell + used, sizeof(info->shell) - used, "%s",
+               info->nu_version);
+    }
+    set_str(info->shell_name, sizeof(info->shell_name), "nu");
+    return;
+  }
 
   if (shell && shell[0]) {
     set_str(info->shell, sizeof(info->shell), shell);
@@ -289,9 +332,7 @@ static void detect_shell(struct about_info *info) {
     if (!comspec) {
       comspec = getenv("COMSPEC");
     }
-    if (getenv("NU_VERSION")) {
-      set_str(info->shell, sizeof(info->shell), "nu");
-    } else if (psmod && *psmod) {
+    if (psmod && *psmod) {
       /* Likely PowerShell session */
       if (getenv("POWERSHELL_DISTRIBUTION_CHANNEL") ||
           getenv("PSVersionTable") /* rarely exported */) {
@@ -469,6 +510,151 @@ static void print_field(const char *label, const char *value) {
   printf("  %-14s %s\n", label, value && value[0] ? value : "(unknown)");
 }
 
+static void print_nuon_string(const char *s) {
+  putchar('"');
+  if (!s) {
+    putchar('"');
+    return;
+  }
+  for (; *s; s++) {
+    unsigned char c = (unsigned char)*s;
+    if (c == '\\' || c == '"') {
+      putchar('\\');
+      putchar((char)c);
+    } else if (c == '\n') {
+      fputs("\\n", stdout);
+    } else if (c == '\r') {
+      fputs("\\r", stdout);
+    } else if (c == '\t') {
+      fputs("\\t", stdout);
+    } else {
+      putchar((char)c);
+    }
+  }
+  putchar('"');
+}
+
+static void print_nuon_field(const char *key, const char *value, int *first) {
+  if (!*first) {
+    fputs(",\n", stdout);
+  }
+  *first = 0;
+  printf("  %s: ", key);
+  print_nuon_string(value && value[0] ? value : "(unknown)");
+}
+
+static void print_nuon(const struct about_info *info) {
+  int first = 1;
+  puts("{");
+  print_nuon_field("distro", info->distro, &first);
+  print_nuon_field("kernel", info->kernel, &first);
+  print_nuon_field("environment", info->environment, &first);
+  print_nuon_field("arch", info->arch, &first);
+  print_nuon_field("hostname", info->hostname, &first);
+  print_nuon_field("user", info->user, &first);
+  print_nuon_field("shell", info->shell, &first);
+  print_nuon_field("shell_name", info->shell_name, &first);
+  print_nuon_field("home", info->home, &first);
+  print_nuon_field("cwd", info->cwd, &first);
+  print_nuon_field("terminal", info->term, &first);
+  print_nuon_field("about", ABOUT_VERSION, &first);
+  if (info->in_nushell) {
+    print_nuon_field("nushell", info->nu_version, &first);
+  }
+  if (!first) {
+    fputs(",\n", stdout);
+  }
+  printf("  in_nushell: %s\n", info->in_nushell ? "true" : "false");
+  puts("}");
+}
+
+static void print_row(const char *label, const char *value) {
+  char cell[45];
+  const char *v = value && value[0] ? value : "(unknown)";
+  size_t len = strlen(v);
+  if (len > 44) {
+    memcpy(cell, v, 41);
+    cell[41] = '.';
+    cell[42] = '.';
+    cell[43] = '.';
+    cell[44] = '\0';
+    v = cell;
+  }
+  printf("│ %-14s │ %-44s │\n", label, v);
+}
+
+static void print_report_nushell(const struct about_info *info) {
+  puts("");
+  puts("about — where am I?  (Nushell session)");
+  puts("╭────────────────┬──────────────────────────────────────────────╮");
+  print_row("OS / Distro", info->distro);
+  print_row("Kernel", info->kernel);
+  print_row("Environment", info->environment);
+  print_row("Arch", info->arch);
+  print_row("Hostname", info->hostname);
+  print_row("User", info->user);
+  print_row("Shell", info->shell);
+  print_row("Home", info->home);
+  print_row("CWD", info->cwd);
+  print_row("Terminal", info->term);
+  print_row("about", ABOUT_VERSION);
+  puts("╰────────────────┴──────────────────────────────────────────────╯");
+}
+
+static void print_tips_nushell(const struct about_info *info) {
+  puts("");
+  puts("Look around (Nushell — structured, cross-platform)");
+  puts("────────────────────────────────────────");
+  puts("  sys                         # host / cpu / mem / disks / net");
+  puts("  sys host                    # hostname, OS family, kernel");
+  puts("  sys disk                    # volumes (structured)");
+  puts("  sys mem                     # memory");
+  puts("  version                     # this Nushell build");
+  puts("  $nu.os-info                 # OS name / arch / family");
+  puts("  $env | sort                 # environment as a table");
+  puts("  ls /                        # filesystem roots (records)");
+  puts("  df                          # disk free space");
+  puts("  ps                          # processes as a table");
+  puts("  which apt dnf zypper brew winget   # package managers on PATH");
+  puts("  help commands | where name =~ 'sys'  # discover related builtins");
+  puts("  about --format nuon | from nuon      # machine-readable about");
+  if (info->is_wsl) {
+    puts("  ^wsl.exe -l -v              # list WSL distros (external)");
+    puts("  $env.WSL_DISTRO_NAME?       # this distro's name (if set)");
+  }
+  if (info->is_windows && !info->is_wsl) {
+    puts("  ^wsl.exe -l -v              # Linux distros on this Windows host");
+  }
+  puts("");
+  puts("You're already out of the text-soup shells. Stay in `nu`.");
+  puts("");
+}
+
+static void print_nushell_nudge(const struct about_info *info) {
+  puts("Escape hatch: Nushell");
+  puts("────────────────────────────────────────");
+  puts("  You're in an old-fashioned shell — flags, pipes of text, and");
+  puts("  tribal knowledge just to answer \"what machine is this?\"");
+  puts("");
+  puts("  Nushell gives the same answers as structured tables:");
+  puts("    sys host / sys disk / $env / ls / df / ps");
+  puts("");
+  puts("  Install:  https://www.nushell.sh/");
+  puts("    winget install Nushell.Nushell     # Windows");
+  puts("    brew install nushell               # macOS / Linuxbrew");
+  puts("    cargo install nu                   # anywhere with Rust");
+  puts("    # or your distro package (apt, dnf, pacman, …)");
+  puts("");
+  if (info->nu_on_path) {
+    puts("  `nu` is already on PATH — run:  nu");
+    puts("  Then re-run `about` for a Nushell-native cheat sheet.");
+  } else {
+    puts("  After install, run:  nu");
+    puts("  Then re-run `about` inside Nushell for the good tips.");
+  }
+  puts("");
+}
+
 static void print_tips_linux(int is_wsl) {
   puts("  cat /etc/os-release          # distro identity (PRETTY_NAME, ID)");
   puts("  uname -a                     # kernel, arch, hostname");
@@ -518,7 +704,27 @@ static void print_tips_bsd(void) {
   puts("  ifconfig                     # network");
 }
 
-static void print_report(const struct about_info *info, int tips) {
+static void print_tips_classic(const struct about_info *info) {
+  puts("");
+  puts("Look around (common discovery commands for this shell)");
+  puts("────────────────────────────────────────");
+  if (info->is_linux) {
+    print_tips_linux(info->is_wsl);
+  } else if (info->is_macos) {
+    print_tips_macos();
+  } else if (info->is_windows) {
+    print_tips_windows();
+  } else if (info->is_bsd) {
+    print_tips_bsd();
+  } else {
+    puts("  uname -a");
+    puts("  echo \"$SHELL\"");
+    puts("  env | sort");
+  }
+  puts("");
+}
+
+static void print_report_classic(const struct about_info *info) {
   puts("");
   puts("about — where am I?");
   puts("────────────────────────────────────────");
@@ -537,6 +743,15 @@ static void print_report(const struct about_info *info, int tips) {
   print_field("Terminal:", info->term);
   printf("  %-14s %s\n", "about:", ABOUT_VERSION);
   puts("────────────────────────────────────────");
+}
+
+static void print_report(const struct about_info *info, int tips,
+                         int use_nu_tips) {
+  if (info->in_nushell) {
+    print_report_nushell(info);
+  } else {
+    print_report_classic(info);
+  }
 
   if (!tips) {
     puts("  (tips omitted; pass --tips or run without --quiet)");
@@ -544,37 +759,30 @@ static void print_report(const struct about_info *info, int tips) {
     return;
   }
 
-  puts("");
-  puts("Look around (common discovery commands)");
-  puts("────────────────────────────────────────");
-  if (info->is_linux) {
-    print_tips_linux(info->is_wsl);
-  } else if (info->is_macos) {
-    print_tips_macos();
-  } else if (info->is_windows) {
-    print_tips_windows();
-  } else if (info->is_bsd) {
-    print_tips_bsd();
+  if (use_nu_tips) {
+    print_tips_nushell(info);
   } else {
-    puts("  uname -a");
-    puts("  echo \"$SHELL\"");
-    puts("  env | sort");
+    print_tips_classic(info);
+    print_nushell_nudge(info);
+    puts("Tip: install this binary on PATH as `about` so every shell");
+    puts("     can answer \"what machine is this?\" in one word.");
+    puts("");
   }
-  puts("");
-  puts("Tip: install this binary on PATH as `about` so every shell");
-  puts("     can answer \"what machine is this?\" in one word.");
-  puts("");
 }
 
 static void print_usage(const char *argv0) {
   printf("Usage: %s [options]\n\n", argv0);
   puts("Orient yourself: distro/OS, shell, and how to explore further.");
+  puts("Works in any shell; under Nushell, tips become structured `nu` idioms.");
   puts("");
   puts("Options:");
-  puts("  -h, --help      Show this help");
-  puts("  -v, --version   Print version");
-  puts("  -q, --quiet     Facts only (no discovery tips)");
-  puts("  -t, --tips      Tips only (skip the facts header)");
+  puts("  -h, --help           Show this help");
+  puts("  -v, --version        Print version");
+  puts("  -q, --quiet          Facts only (no discovery tips / nudge)");
+  puts("  -t, --tips           Tips only (skip the facts header)");
+  puts("  --format text|nuon   Output format (default: text)");
+  puts("  --nu                 Force Nushell tip sheet (even outside nu)");
+  puts("  --classic            Force classic UNIX/PowerShell tip sheet");
   puts("");
 }
 
@@ -582,6 +790,9 @@ int main(int argc, char **argv) {
   struct about_info info;
   int tips = 1;
   int tips_only = 0;
+  int force_nu = 0;
+  int force_classic = 0;
+  enum about_format fmt = ABOUT_FMT_TEXT;
   int i;
 
   for (i = 1; i < argc; i++) {
@@ -601,29 +812,79 @@ int main(int argc, char **argv) {
       tips_only = 1;
       continue;
     }
+    if (strcmp(argv[i], "--nu") == 0) {
+      force_nu = 1;
+      continue;
+    }
+    if (strcmp(argv[i], "--classic") == 0) {
+      force_classic = 1;
+      continue;
+    }
+    if (strcmp(argv[i], "--format") == 0) {
+      if (i + 1 >= argc) {
+        fprintf(stderr, "about: --format needs text or nuon\n");
+        return 2;
+      }
+      i++;
+      if (strcmp(argv[i], "text") == 0) {
+        fmt = ABOUT_FMT_TEXT;
+      } else if (strcmp(argv[i], "nuon") == 0) {
+        fmt = ABOUT_FMT_NUON;
+      } else {
+        fprintf(stderr, "about: unknown format: %s (use text or nuon)\n",
+                argv[i]);
+        return 2;
+      }
+      continue;
+    }
+    if (strncmp(argv[i], "--format=", 9) == 0) {
+      const char *f = argv[i] + 9;
+      if (strcmp(f, "text") == 0) {
+        fmt = ABOUT_FMT_TEXT;
+      } else if (strcmp(f, "nuon") == 0) {
+        fmt = ABOUT_FMT_NUON;
+      } else {
+        fprintf(stderr, "about: unknown format: %s (use text or nuon)\n", f);
+        return 2;
+      }
+      continue;
+    }
     fprintf(stderr, "about: unknown option: %s\n", argv[i]);
     print_usage(argv[0]);
     return 2;
   }
 
-  gather(&info);
-
-  if (tips_only) {
-    puts("Look around (common discovery commands)");
-    puts("────────────────────────────────────────");
-    if (info.is_linux) {
-      print_tips_linux(info.is_wsl);
-    } else if (info.is_macos) {
-      print_tips_macos();
-    } else if (info.is_windows) {
-      print_tips_windows();
-    } else if (info.is_bsd) {
-      print_tips_bsd();
-    }
-    puts("");
-    return 0;
+  if (force_nu && force_classic) {
+    fprintf(stderr, "about: --nu and --classic are mutually exclusive\n");
+    return 2;
   }
 
-  print_report(&info, tips);
-  return 0;
+  gather(&info);
+
+  {
+    int use_nu_tips = info.in_nushell;
+    if (force_nu) {
+      use_nu_tips = 1;
+    } else if (force_classic) {
+      use_nu_tips = 0;
+    }
+
+    if (fmt == ABOUT_FMT_NUON) {
+      print_nuon(&info);
+      return 0;
+    }
+
+    if (tips_only) {
+      if (use_nu_tips) {
+        print_tips_nushell(&info);
+      } else {
+        print_tips_classic(&info);
+        print_nushell_nudge(&info);
+      }
+      return 0;
+    }
+
+    print_report(&info, tips, use_nu_tips);
+    return 0;
+  }
 }

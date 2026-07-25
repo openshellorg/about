@@ -1,7 +1,7 @@
 CC ?= cc
 CFLAGS ?= -std=c11 -Wall -Wextra -O2
 CPPFLAGS ?= -DABOUT_VERSION=\"$(VERSION)\"
-VERSION ?= 0.1.0
+VERSION ?= 0.2.0
 
 PREFIX ?= /usr/local
 BINDIR ?= $(PREFIX)/bin
@@ -42,6 +42,8 @@ smoke: $(BIN)
 	./$(BIN) --version
 	./$(BIN) -q
 	./$(BIN) --tips >/dev/null
+	./$(BIN) --nu --tips >/dev/null
+	./$(BIN) --format nuon >/dev/null
 
 test: smoke
 
