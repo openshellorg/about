@@ -5,4 +5,10 @@
 * xref:info::index.adoc[info] — Info TUI (OpenShellOrg)
 * xref:nu-require::index.adoc[nu-require] — require / relaunch under Nushell
 * xref:shell-architecture::index.adoc[shell-architecture] — OpenShellOrg thesis
+* xref:shell-architecture::entrypoint-dispatch.adoc[Entrypoint Dispatch] — auto-install + re-exec at the shell boundary
 * https://justine.lol/cosmopolitan/[Cosmopolitan Libc] — build-once run-anywhere C
+
+== Related orgs
+
+* https://devcentr.org/[DevCentr] · https://docs.devcentr.org/[docs] · https://github.com/dev-centr[GitHub] — environments + Toolchain Management
+* https://github.com/dlang-supplemental[dlang-supplemental] — D libraries and tooling
