@@ -1,25 +1,45 @@
-= about
+ifndef::env-github[:icons: font]
 :toc: preamble
-:icons: font
+:toclevels: 2
+:sectanchors:
+
+ifndef::env-github[]
+image:https://img.shields.io/github/contributors/openshellorg/about.svg?style=for-the-badge[Contributors,link=https://github.com/openshellorg/about/graphs/contributors]
+image:https://img.shields.io/github/forks/openshellorg/about.svg?style=for-the-badge[Forks,link=https://github.com/openshellorg/about/network/members]
+image:https://img.shields.io/github/stars/openshellorg/about.svg?style=for-the-badge[Stars,link=https://github.com/openshellorg/about/stargazers]
+image:https://img.shields.io/github/issues/openshellorg/about.svg?style=for-the-badge[Issues,link=https://github.com/openshellorg/about/issues]
+image:https://img.shields.io/github/license/openshellorg/about.svg?style=for-the-badge[License,link=https://github.com/openshellorg/about/blob/main/LICENSE]
+endif::[]
+
+ifdef::env-github[]
+image:https://img.shields.io/github/contributors/openshellorg/about.svg?style=for-the-badge[Contributors]
+image:https://img.shields.io/github/forks/openshellorg/about.svg?style=for-the-badge[Forks]
+image:https://img.shields.io/github/stars/openshellorg/about.svg?style=for-the-badge[Stars]
+image:https://img.shields.io/github/issues/openshellorg/about.svg?style=for-the-badge[Issues]
+image:https://img.shields.io/github/license/openshellorg/about.svg?style=for-the-badge[License]
+endif::[]
+
+= about
+
+Orient yourself: OS/distro, shell, and how to look around — Cosmopolitan APE universal binary.
+
+link:https://github.com/openshellorg/about/issues[Report Bug] ·
+link:https://github.com/openshellorg/about/issues[Request Feature]
+
+== About The Project
 
 One command to answer: *what machine is this, and how do I look around?*
 
-== Why
+Drop into a random Linux box via `wsl`, SSH, a container, or a teammate's laptop, and the discovery story is a mess. `about` prints the orientation facts first, then a short cheat sheet of the commands that actually help on *this* OS family.
 
-Drop into a random Linux box via `wsl`, SSH, a container, or a teammate's
-laptop, and the discovery story is a mess: `/etc/os-release` (sometimes),
-`uname`, `sw_vers`, `systeminfo`, `$SHELL` vs `ps -p $$`, WSL env vars that
-only exist on good days…
+Under https://www.nushell.sh/[Nushell], the cheat sheet switches to structured `nu` idioms. Outside Nushell, you still get the full classic tip sheet — plus a nudge to install `nu`. Nushell is never required; `about` always runs.
 
-`about` prints the orientation facts first, then a short cheat sheet of the
-commands that actually help on *this* OS family.
+== Built With
 
-Under https://www.nushell.sh/[Nushell], the cheat sheet switches to structured
-`nu` idioms (`sys`, `$env`, `ls`, …). Outside Nushell, you still get the full
-classic tip sheet — plus a nudge to install `nu` and leave the text-soup shells
-behind. Nushell is never required; `about` always runs.
+* C
+* https://justine.lol/cosmopolitan/[Cosmopolitan Libc] (APE universal binary)
 
-== Quick start
+== Getting Started
 
 [source,shell]
 ----
@@ -35,12 +55,7 @@ sudo make install    # PREFIX=/usr/local by default
 about
 ----
 
-== Actually Portable Executable (recommended release artifact)
-
-Release builds use https://justine.lol/cosmopolitan/[Cosmopolitan Libc]
-(Justine Tunney) to produce an
-https://justine.lol/ape.html[Actually Portable Executable] — one fat binary
-that runs natively on Linux, macOS, Windows, and BSDs (amd64 + arm64).
+=== Actually Portable Executable (recommended release artifact)
 
 [source,shell]
 ----
@@ -48,13 +63,9 @@ make ape             # downloads cosmocc into .cosmocc/ on first run
 ./about.com
 ----
 
-On Windows you can rename `about.com` → `about.exe` if your shell expects an
-extension. On some Linux distros you may need the APE loader registered with
-`binfmt_misc` (see Cosmopolitan docs) if the kernel tries to hand the MZ
-header to WINE.
-
 == Usage
 
+[source]
 ----
 about                 # facts + discovery tips (nu-aware)
 about tar             # short orientation card for a command
@@ -66,44 +77,29 @@ about --format nuon   # structured record (pipe: about --format nuon | from nuon
 about --version
 ----
 
-== Nushell
+=== What it reports
 
-Detection uses `$env.NU_VERSION` (exported to child processes). When present:
-
-* Facts render as a small table
-* Tips use Nushell builtins (`sys`, `$nu.os-info`, `$env`, `df`, `ps`, …)
-* `--format nuon` emits a record you can `from nuon` in a pipeline
-
-When *not* under Nushell, tips stay classic (bash/zsh/pwsh/cmd idioms) and
-`about` points you at https://www.nushell.sh/[nushell.sh] with install hints.
-If `nu` is already on `PATH`, it tells you to just run it.
-
-== What it reports
-
-* OS / distro (`/etc/os-release`, `sw_vers`, Windows `ver`, …)
-* Kernel + architecture (`uname`)
+* OS / distro, kernel + architecture
 * Environment: native, WSL2, container hints
 * Hostname, user, home, cwd
-* Shell (`$SHELL`, passwd shell, or Windows `ComSpec` / PowerShell clues;
-  prefers live Nushell via `NU_VERSION` when present)
-* Terminal (`TERM_PROGRAM` / `TERM` / Windows Terminal)
-
-Plus platform-specific “look around” commands — Nushell builtins under `nu`,
-classic tools otherwise (`df`, `free`/`vm_stat`, package-manager probes,
-`wsl -l -v`, etc.).
+* Shell and terminal detection
+* Platform-specific "look around" commands
 
 == Related
 
 * https://github.com/openshellorg/shell-architecture[shell-architecture] — OpenShellOrg thesis
 * https://github.com/openshellorg/prohelp[prohelp] — progressive help + global `help`
-* https://github.com/openshellorg/info[info] — Info TUI (OpenShellOrg)
 * https://github.com/openshellorg/nu-require[nu-require] — require / relaunch under Nushell
-* https://justine.lol/cosmopolitan/[Cosmopolitan Libc] — build-once run-anywhere C
-
-== Changelog
 
 See link:CHANGELOG.adoc[CHANGELOG.adoc].
 
 == License
 
-MIT — see link:LICENSE[]
+MIT — see link:LICENSE[LICENSE].
+
+== Contact
+
+Open Shell Org — openshell@devcentr.org
+
+* Project: https://github.com/openshellorg/about
+* Site: https://openshellorg.github.io

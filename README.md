@@ -1,12 +1,22 @@
-# about
+<a id="readme-top"></a>
 
-One command to answer: **what machine is this, and how do I look around?**
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![License][license-shield]][license-url]
 
-Works in any shell. Under [Nushell](https://www.nushell.sh/), tips become
-structured `nu` idioms; elsewhere you get classic commands plus a nudge to
-install `nu`.
+<div align="center">
+  <h1>about</h1>
+  <p>Orient yourself: OS/distro, shell, and how to look around — Cosmopolitan APE universal binary.</p>
+  <p>
+    <a href="https://github.com/openshellorg/about/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/openshellorg/about/issues">Request Feature</a>
+  </p>
+</div>
 
-Full docs: [README.adoc](README.adoc)
+See [README.adoc](README.adoc) for full documentation.
 
 ```shell
 make && ./about
@@ -14,4 +24,22 @@ make ape   # Cosmopolitan Actually Portable Executable
 ./about --format nuon   # structured record for Nushell pipelines
 ```
 
-MIT © Open Shell Organization
+## Contact
+
+Open Shell Org — openshell@devcentr.org
+
+Project Link: https://github.com/openshellorg/about
+
+Site: https://openshellorg.github.io
+
+<!-- MARKDOWN LINKS & IMAGES -->
+[contributors-shield]: https://img.shields.io/github/contributors/openshellorg/about.svg?style=for-the-badge
+[contributors-url]: https://github.com/openshellorg/about/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/openshellorg/about.svg?style=for-the-badge
+[forks-url]: https://github.com/openshellorg/about/network/members
+[stars-shield]: https://img.shields.io/github/stars/openshellorg/about.svg?style=for-the-badge
+[stars-url]: https://github.com/openshellorg/about/stargazers
+[issues-shield]: https://img.shields.io/github/issues/openshellorg/about.svg?style=for-the-badge
+[issues-url]: https://github.com/openshellorg/about/issues
+[license-shield]: https://img.shields.io/github/license/openshellorg/about.svg?style=for-the-badge
+[license-url]: https://github.com/openshellorg/about/blob/main/LICENSE
