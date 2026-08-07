@@ -3,8 +3,28 @@ ifndef::env-github[:icons: font]
 :toclevels: 2
 :sectanchors:
 
-[[readme-top]]
+ifdef::env-github[]
+++++
+<a id="readme-top"></a>
+<div align="center">
+<a href="https://github.com/openshellorg/about/graphs/contributors"><img src="https://img.shields.io/github/contributors/openshellorg/about.svg?style=for-the-badge" alt="Contributors"></a>
+<a href="https://github.com/openshellorg/about/network/members"><img src="https://img.shields.io/github/forks/openshellorg/about.svg?style=for-the-badge" alt="Forks"></a>
+<a href="https://github.com/openshellorg/about/stargazers"><img src="https://img.shields.io/github/stars/openshellorg/about.svg?style=for-the-badge" alt="Stars"></a>
+<a href="https://github.com/openshellorg/about/issues"><img src="https://img.shields.io/github/issues/openshellorg/about.svg?style=for-the-badge" alt="Issues"></a>
+<a href="https://github.com/openshellorg/about/blob/main/LICENSE"><img src="https://img.shields.io/github/license/openshellorg/about.svg?style=for-the-badge" alt="License"></a>
+<br />
+<h3 align="center">about</h3>
+<p align="center">
+Orient yourself: OS/distro, shell, and how to look around — Cosmopolitan APE universal binary.<br /><br />
+<a href="https://github.com/openshellorg/about/issues">Report Bug</a>
+&middot;
+<a href="https://github.com/openshellorg/about/issues">Request Feature</a>
+</p>
+</div>
+++++
+endif::[]
 
+ifndef::env-github[]
 image:https://img.shields.io/github/contributors/openshellorg/about.svg?style=for-the-badge[Contributors,link=https://github.com/openshellorg/about/graphs/contributors]
 image:https://img.shields.io/github/forks/openshellorg/about.svg?style=for-the-badge[Forks,link=https://github.com/openshellorg/about/network/members]
 image:https://img.shields.io/github/stars/openshellorg/about.svg?style=for-the-badge[Stars,link=https://github.com/openshellorg/about/stargazers]
@@ -17,6 +37,7 @@ Orient yourself: OS/distro, shell, and how to look around — Cosmopolitan APE u
 
 link:https://github.com/openshellorg/about/issues[Report Bug] ·
 link:https://github.com/openshellorg/about/issues[Request Feature]
+endif::[]
 
 == About The Project
 

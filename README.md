@@ -6,9 +6,14 @@
   <a href="https://github.com/openshellorg/about/issues"><img src="https://img.shields.io/github/issues/openshellorg/about.svg?style=for-the-badge" alt="Issues"></a>
   <a href="https://github.com/openshellorg/about/blob/main/LICENSE"><img src="https://img.shields.io/github/license/openshellorg/about.svg?style=for-the-badge" alt="License"></a>
 
-  <h1>about</h1>
-  <p>Orient yourself: OS/distro, shell, and how to look around — Cosmopolitan APE universal binary.</p>
-  <p>
+  <h3 align="center">about</h3>
+
+  <p align="center">
+    Orient yourself: OS/distro, shell, and how to look around — Cosmopolitan APE universal binary.
+    <br />
+    <a href="README.adoc"><strong>Explore the docs »</strong></a>
+    <br />
+    <br />
     <a href="https://github.com/openshellorg/about/issues">Report Bug</a>
     &middot;
     <a href="https://github.com/openshellorg/about/issues">Request Feature</a>
@@ -23,14 +28,32 @@ make ape   # Cosmopolitan Actually Portable Executable
 ./about --format nuon   # structured record for Nushell pipelines
 ```
 
+## Built With
+
+* **Language** — C
+* **Portability** — [![Cosmopolitan][Cosmo]][Cosmo-url]
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Contributing
+
+### Top contributors
+
+<a href="https://github.com/openshellorg/about/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=openshellorg/about" alt="contributors" />
+</a>
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Contact
 
 Open Shell Org — openshell@devcentr.org
 
-Project Link: [https://github.com/openshellorg/about](https://github.com/openshellorg/about)
+Project Link: https://github.com/openshellorg/about
 
-Site: [https://openshellorg.github.io](https://openshellorg.github.io)
+Site: https://openshellorg.github.io
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+[Cosmo]: https://img.shields.io/badge/Cosmopolitan-000000?style=for-the-badge&logo=c&logoColor=white
+[Cosmo-url]: https://justine.lol/cosmopolitan/
