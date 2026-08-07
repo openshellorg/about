@@ -3,21 +3,13 @@ ifndef::env-github[:icons: font]
 :toclevels: 2
 :sectanchors:
 
-ifndef::env-github[]
+[[readme-top]]
+
 image:https://img.shields.io/github/contributors/openshellorg/about.svg?style=for-the-badge[Contributors,link=https://github.com/openshellorg/about/graphs/contributors]
 image:https://img.shields.io/github/forks/openshellorg/about.svg?style=for-the-badge[Forks,link=https://github.com/openshellorg/about/network/members]
 image:https://img.shields.io/github/stars/openshellorg/about.svg?style=for-the-badge[Stars,link=https://github.com/openshellorg/about/stargazers]
 image:https://img.shields.io/github/issues/openshellorg/about.svg?style=for-the-badge[Issues,link=https://github.com/openshellorg/about/issues]
 image:https://img.shields.io/github/license/openshellorg/about.svg?style=for-the-badge[License,link=https://github.com/openshellorg/about/blob/main/LICENSE]
-endif::[]
-
-ifdef::env-github[]
-image:https://img.shields.io/github/contributors/openshellorg/about.svg?style=for-the-badge[Contributors]
-image:https://img.shields.io/github/forks/openshellorg/about.svg?style=for-the-badge[Forks]
-image:https://img.shields.io/github/stars/openshellorg/about.svg?style=for-the-badge[Stars]
-image:https://img.shields.io/github/issues/openshellorg/about.svg?style=for-the-badge[Issues]
-image:https://img.shields.io/github/license/openshellorg/about.svg?style=for-the-badge[License]
-endif::[]
 
 = about
 
@@ -34,10 +26,20 @@ Drop into a random Linux box via `wsl`, SSH, a container, or a teammate's laptop
 
 Under https://www.nushell.sh/[Nushell], the cheat sheet switches to structured `nu` idioms. Outside Nushell, you still get the full classic tip sheet — plus a nudge to install `nu`. Nushell is never required; `about` always runs.
 
+++++
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+++++
+
 == Built With
 
-* C
-* https://justine.lol/cosmopolitan/[Cosmopolitan Libc] (APE universal binary)
+* Language
+** link:https://en.cppreference.com/w/c[image:https://img.shields.io/badge/C-A8B9CC?style=for-the-badge&logo=c&logoColor=black[C]]
+* Portability
+** link:https://justine.lol/cosmopolitan/[image:https://img.shields.io/badge/Cosmopolitan-000000?style=for-the-badge[Cosmopolitan Libc]] (APE universal binary)
+
+++++
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+++++
 
 == Getting Started
 
@@ -97,9 +99,17 @@ See link:CHANGELOG.adoc[CHANGELOG.adoc].
 
 MIT — see link:LICENSE[LICENSE].
 
+++++
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+++++
+
 == Contact
 
 Open Shell Org — openshell@devcentr.org
 
 * Project: https://github.com/openshellorg/about
 * Site: https://openshellorg.github.io
+
+++++
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+++++
