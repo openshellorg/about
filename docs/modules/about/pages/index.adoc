@@ -1,17 +1,21 @@
 = about
-:description: Orient yourself — OS, shell, and how to look around.
+:description: Portable CLI for machine orientation — OS, shell, environment, and how to look around.
+:page-audience: operators and developers who land on unfamiliar machines
+:page-usage-context: reference for building, running, and interpreting output from the `about` CLI
+:page-orig-author: OpenShellOrg
+:page-last-author: cursor-agent on behalf of amdphreak
+:page-last-edited: 2026-09-29
 
-One command to answer: *what machine is this, and how do I look around?*
+`about` is a portable CLI that prints machine orientation (OS, shell, environment) and a short OS-family cheat sheet for looking around.
+Under https://www.nushell.sh/[Nushell], the cheat sheet uses `nu` idioms (`sys`, `$env`, `ls`, …).
+Outside Nushell, you still get the full classic tip sheet — plus a nudge to install `nu`.
+Nushell is never required; `about` always runs.
 
 == Why
 
 Drop into a random Linux box via `wsl`, SSH, a container, or a teammate's laptop, and the discovery story is a mess: `/etc/os-release` (sometimes), `uname`, `sw_vers`, `systeminfo`, `$SHELL` vs `ps -p $$`, WSL env vars that only exist on good days…
 
 `about` prints the orientation facts first, then a short cheat sheet of the commands that actually help on *this* OS family.
-
-Under https://www.nushell.sh/[Nushell], the cheat sheet switches to structured `nu` idioms (`sys`, `$env`, `ls`, …).
-Outside Nushell, you still get the full classic tip sheet — plus a nudge to install `nu`.
-Nushell is never required; `about` always runs.
 
 == Quick start
 
