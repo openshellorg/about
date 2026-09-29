@@ -1,4 +1,4 @@
-* xref:index.adoc[`about`]
+* xref:index.adoc[`about` CLI]
 * xref:usage.adoc[Usage]
 * xref:nushell.adoc[Nushell]
 * xref:build.adoc[Building]

@@ -1,4 +1,4 @@
-= `about`
+= `about` CLI
 :description: `about` CLI command for machine orientation — OS, shell, environment, and how to look around.
 :page-audience: operators and developers who land on unfamiliar machines
 :page-usage-context: reference for building, running, and interpreting output from the `about` CLI
