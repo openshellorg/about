@@ -6,9 +6,10 @@
 :page-last-author: cursor-agent on behalf of amdphreak
 :page-last-edited: 2026-09-29
 
-`about` is a portable CLI that prints machine orientation (OS, shell, environment) and a short OS-family cheat sheet for looking around.
-Under https://www.nushell.sh/[Nushell], the cheat sheet uses `nu` idioms (`sys`, `$env`, `ls`, …).
-Outside Nushell, you still get the full classic tip sheet — plus a nudge to install `nu`.
+`about` is a command for the CLI that orients you on a machine you didn't set up — OS, shell, environment, and a short cheat sheet of ways to look around on that OS family.
+
+When you're in https://www.nushell.sh/[Nushell], those tips speak `nu` (`sys`, `$env`, `ls`, …).
+When you're not, you still get the full classic tip sheet, plus a nudge to install `nu`.
 Nushell is never required; `about` always runs.
 
 == Why
