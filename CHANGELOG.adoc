@@ -7,6 +7,7 @@ For longer narratives, see link:changelog-details/[changelog-details/] (when pre
 
 == Timeline
 
+* 2026-09-30 — Docs: correct `about` overview page-context authorship (Ryan Johnson / AMDphreak; GitHub links for original author and byline).
 * 2026-09-29 — Antora: register under shared `tools` component (`about` module); rewrite overview lede for machine-orientation CLI.
 * 2026-09-29 — Docs: open overview with `` `about` `` as a CLI command in loose prose (Nushell-optional behavior unchanged).
 * 2026-09-29 — Docs: H1 and nav show `` `about` `` CLI (Antora inline formatting for breadcrumbs).
