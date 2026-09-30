@@ -2,8 +2,10 @@
 :description: Portable CLI for machine orientation — OS, shell, environment, and how to look around.
 :page-audience: operators and developers who land on unfamiliar machines
 :page-usage-context: reference for building, running, and interpreting output from the `about` CLI
-:page-orig-author: OpenShellOrg
+:page-orig-author: Ryan Johnson
+:page-orig-author-github: AMDphreak
 :page-last-author: cursor-agent on behalf of amdphreak
+:page-last-author-github: AMDphreak
 :page-last-edited: 2026-09-29
 
 `about` is a command for the CLI that orients you on a machine you didn't set up — OS, shell, environment, and a short cheat sheet of ways to look around on that OS family.
