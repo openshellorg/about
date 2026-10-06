@@ -15,3 +15,5 @@
 !.github/**
 !changelog-details/
 !changelog-details/**
+!/.editorconfig
+!/.gitattributes
